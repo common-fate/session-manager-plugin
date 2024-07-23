@@ -190,12 +190,12 @@ func (p *MuxPortForwarding) handleControlSignals(log log.T) {
 	signal.Notify(c, sessionutil.ControlSignals...)
 	go func() {
 		<-c
-		fmt.Println("Terminate signal received, exiting.")
+		log.Info("Terminate signal received, exiting.")
 
 		if err := p.session.DataChannel.SendFlag(log, message.TerminateSession); err != nil {
 			log.Errorf("Failed to send TerminateSession flag: %v", err)
 		}
-		fmt.Fprintf(os.Stdout, "\n\nExiting session with sessionId: %s.\n\n", p.sessionId)
+		log.Info("\n\nExiting session with sessionId: %s.\n\n", p.sessionId)
 		p.Stop()
 	}()
 }
@@ -252,10 +252,10 @@ func (p *MuxPortForwarding) handleClientConnections(log log.T, ctx context.Conte
 	defer listener.Close()
 
 	log.Infof(displayMsg)
-	fmt.Printf(displayMsg)
+	// fmt.Printf(displayMsg)
 
 	log.Infof("Waiting for connections...\n")
-	fmt.Printf("\nWaiting for connections...\n")
+	// fmt.Printf("\nWaiting for connections...\n")
 
 	var once sync.Once
 	for {
@@ -269,7 +269,7 @@ func (p *MuxPortForwarding) handleClientConnections(log log.T, ctx context.Conte
 				log.Infof("Connection accepted from %s\n for session [%s]", conn.RemoteAddr(), p.sessionId)
 
 				once.Do(func() {
-					fmt.Printf("\nConnection accepted for session [%s]\n", p.sessionId)
+					log.Infof("\nConnection accepted for session [%s]\n", p.sessionId)
 				})
 
 				stream, err := p.muxClient.session.OpenStream()
